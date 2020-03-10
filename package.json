@@ -1,0 +1,25 @@
+{
+  "name": "tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ellen0404/Employee_tracker_MYSQL_ED.git"
+  },
+  "author": "Elena Demidionok",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ellen0404/Employee_tracker_MYSQL_ED/issues"
+  },
+  "homepage": "https://github.com/Ellen0404/Employee_tracker_MYSQL_ED#readme",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "inquirer": "^7.0.6",
+    "mysql": "^2.18.1"
+  }
+}
