@@ -60,3 +60,16 @@ INSERT INTO role (roleID, title, salary, department_id) VALUES (88,"Lead Enginee
  INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("Tom","Hender",88,null); 
  INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ("Mila","Cohen",66,null); 
 
+
+SELECT  employee.id, employee.first_name, employee.last_name,employee.manager_id, role.title, role.salary, department.name
+FROM employee 
+LEFT JOIN role ON employee.role_id=role.roleID
+LEFT JOIN department ON role.department_id=department.id
+ORDER BY employee.id;
+
+CREATE TABLE allEmployees AS 
+SELECT  employee.id, employee.first_name, employee.last_name,employee.manager_id, role.title, role.salary, department.name
+FROM employee 
+LEFT JOIN role ON employee.role_id=role.roleID
+LEFT JOIN department ON role.department_id=department.id
+ORDER BY employee.id;
