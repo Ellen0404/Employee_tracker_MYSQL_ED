@@ -89,4 +89,10 @@ INNER JOIN department ON role.department_id = department_id
 INNER JOIN employees m ON employees.manager_id = m.id WHERE CONCAT(m.first_name, " ", m.last_name) IN ('Bob Collen')
 GROUP BY employees.id;
 
+--BY DEPARTMENT--
+SELECT employees.id, CONCAT(employees.first_name," ", employees.last_name) AS FullName, department.name AS department
+ FROM employees 
+ LEFT JOIN role on employees.role_id = role.id
+ LEFT JOIN department on role.department_id = department.id 
+
 
