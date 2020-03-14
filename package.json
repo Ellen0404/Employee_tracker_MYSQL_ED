@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Ellen0404/Employee_tracker_MYSQL_ED#readme",
   "dependencies": {
+    "colors": "^1.4.0",
     "console.table": "^0.10.0",
     "inquirer": "^7.0.6",
     "mysql": "^2.18.1"
