@@ -43,7 +43,7 @@ function takeAction() {
                 break;
 
             case "Add Department":
-                // addDepartment();
+                addDepartment();
                 break;
 
             case "Add Role":
@@ -55,7 +55,7 @@ function takeAction() {
                 break;
 
             case "Remove Department":
-                //function goes under:
+                removeDepartment();
                 break;
 
             case "Remove Role":
@@ -135,25 +135,16 @@ function employeeByManager() {
             name: "manager_id",
             type: "list",
             message: "By what Manager would you like to view all employees?",
-            choices: function () {
-                let managerArr = [];
+            choices: res.map(o => ({ name: o.Manager, value: o.id }))
 
-                for (i = 0; i < res.length; i++) {
-                    managerArr.push(`${res[i].id}: ${res[i].Manager}`);
-
-                }
-
-                return managerArr;
-
-            }
         }).then(function (answer) {
             var query = `SELECT employees.id, CONCAT(first_name, " ", last_name) AS Name, role.title 
             FROM employees INNER JOIN role ON employees.role_id = role.id 
-            WHERE employees.manager_id = ${answer.manager_id[0]} GROUP BY employees.id`;
-            connection.query(query, [answer.department],
+            WHERE employees.manager_id = ${answer.manager_id} GROUP BY employees.id`;
+            connection.query(query,
                 function (err, result) {
                     if (err) throw err;
-                    console.log("HELLLOOOO")
+
                     console.table(result);
                     takeAction();
                 });
@@ -161,34 +152,76 @@ function employeeByManager() {
     });
 }
 
-// function addDepartment(){
+function addDepartment() {
+    inquirer.prompt([{
+        message: "What department would you like to add?",
+        type: "input",
+        name: "newdepartment"
+    }]).then(answer => {
+        connection.query(`INSERT INTO department (name) VALUES ("${answer.newdepartment}")`, function (err, res) {
+            if (err) throw err;
+            console.log(`Department ${answer.newdepartment} has been added`);
+            takeAction();
+        });
 
-// }
-function removeEmployee() {
-    var query = "SELECT CONCAT(first_name, ' ', last_name) AS fullName,id FROM employees";
-    connection.query(query, function (err, res) {
-        // console.table(res);
+    })
+
+}
+
+function removeDepartment() {
+    connection.query("SELECT name, id FROM  department", function (err, res) {
+
+        const departmentChoices = res.map(item => {
+            return {
+                name: item.name,
+                value: item.id
+            }
+        });
+
         inquirer.prompt([{
-            name: "removeEmployee",
+            message: "What Department would you like to remove?",
             type: "list",
-            message: "What Employee would you like to remove?",
-            choices:
-                function () {
-                    let dEmployee = [];
-                    for (i = 0; i < res.length; i++) {
-                        dEmployee.push(`${res[i].id}: ${res[i].fullName}`)
-
-                    }
-                    console.log(dEmployee)
-                    return dEmployee;
-                }
-
+            name: "removedDepartment",
+            choices: departmentChoices
 
         }]).then(function (answer) {
-            var query = `DELETE FROM employees WHERE id = "${answer.removeEmployee[0]}"`;
+
+            const thisDepartment = departmentChoices.filter(item => item.value === answer.removedDepartment);
+            var query = `DELETE FROM department WHERE id ="${answer.removedDepartment}"`;
             connection.query(query, function (err, res) {
                 if (err) throw err;
-                console.log(`Employee ${answer.removeEmployee[0]} has been removed`);
+                console.log(`Department ${thisDepartment[0].name} has been removed`);
+                takeAction();
+            })
+        })
+    }
+    )
+};
+function removeEmployee() {
+    var query = "SELECT CONCAT(first_name, ' ', last_name) AS fullName,id FROM employees";
+    connection.query(query, async function (err, res) {
+
+        const employeeChoices = res.map(item => {
+            return {
+                name: item.fullName,
+                value: item.id
+            }
+        });
+
+        inquirer.prompt([{
+
+            type: "list",
+            name: "employeeId",
+            message: "Which employee do you want to remove?",
+            choices: employeeChoices
+
+        }]).then(function (answer) {
+
+            const thisUser = employeeChoices.filter(item => item.value === answer.employeeId);
+            var query = `DELETE FROM employees WHERE id = "${answer.employeeId}"`;
+            connection.query(query, function (err, res) {
+                if (err) throw err;
+                console.log(`Employee ${thisUser[0].name} has been removed`);
                 takeAction();
             });
         })
@@ -210,26 +243,17 @@ const addNewEmployee = () => {
                 message: "What is the employee's role?",
                 type: "list",
                 name: 'role_id',
-                choices: function () {
-                    let roleArr = [];
-                    for (let i = 0; i < data.length; i++) {
-                        roleArr.push(`${data[i].id}: ${data[i].title}`);
-                    }
-                    return roleArr;
-                }
+                choices: data.map(o => ({ name: o.title, value: o.id }))
+
             }, {
                 message: "Who will be this employee's Manager?",
                 type: "list",
                 name: 'manager_id',
-                choices: function () {
-                    let managerArr = [];
-                    for (let i = 0; i < res.length; i++) {
-                        managerArr.push(`${res[i].id}: ${res[i].Manager}`);
-                    }
-                    return managerArr;
-                }
+                choices: res.map(o => ({ name: o.Manager, value: o.id }))
+
+
             }]).then(answer => {
-                connection.query(`INSERT INTO employees(first_name, last_name, role_id, manager_id) VALUES ('${answer.first_name}', '${answer.last_name}', ${answer.role_id[0]}, ${answer.manager_id[0]})`, function (err, res) {
+                connection.query(`INSERT INTO employees(first_name, last_name, role_id, manager_id) VALUES ('${answer.first_name}', '${answer.last_name}', ${answer.role_id}, ${answer.manager_id})`, function (err, res) {
                     if (err) throw err;
                     console.log("--------------")
                     console.log(`Employee ${answer.first_name} ${answer.last_name} has been added`);
